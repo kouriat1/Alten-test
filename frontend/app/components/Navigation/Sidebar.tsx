@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Barcode } from 'lucide-react'
+import { Home, Barcode, Contact } from 'lucide-react'
 
 export default function Sidebar() {
   const pathname = usePathname()
@@ -9,6 +9,8 @@ export default function Sidebar() {
   const menu = [
     { label: 'Accueil', icon: <Home size={18} />, href: '/' },
     { label: 'Produits', icon: <Barcode size={18} />, href: '/products' },
+    { label: 'Contact', icon: <Contact size={18} />, href: '/contact' },
+
   ]
 
   return (
