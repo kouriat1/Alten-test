@@ -30,3 +30,15 @@ model Product {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
+
+model User {
+  id         String @id @default(uuid())
+  username   String @unique
+  firstname  String
+  email      String @unique
+  password   String 
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+}
+
