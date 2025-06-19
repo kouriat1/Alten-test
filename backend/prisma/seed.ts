@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import path from 'path';
+import * as fs from 'fs';
+
 
 const prisma = new PrismaClient();
 
@@ -39,7 +42,28 @@ async function main() {
     });
     console.log(' Utilisateur standard créé');
   }
+      const dataPath = './prisma/products.json';
+
+  const products = JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+
+  for (const product of products) {
+    const exists = await prisma.product.findUnique({ where: { id: product.id } });
+    if (!exists) {
+      await prisma.product.create({
+        data: {
+          ...product,
+            quantity: product.quantity ?? 10,
+          createdAt: new Date(product.createdAt),
+          updatedAt: new Date(product.updatedAt),
+        },
+      });
+    }
+  }
+
+  console.log(`${products.length} produits insérés`);
 }
+
+
 
 main()
   .catch((e) => {
