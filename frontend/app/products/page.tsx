@@ -16,10 +16,13 @@ const ProductsPage = () => {
   }, []);
     return (
         <div>
-        <h1 className="text-2xl flex font-bold mb-4 justify-center items-center">Liste des produits</h1>
+        <h1 className="text-3xl text-gray-500 flex font-bold mb-4 justify-center items-center">Liste des produits</h1>
+            <button className="bg-blue-500 text-white px-4 py-2 flex  items-center mx-auto justify-center rounded hover:bg-blue-400 mb-4">
+                Ajouter un produit  
+            </button>
          <div className="flex-row">
             {products.map((product) => (
-                <div key={product.id} className="border p-4 m-2 rounded shadow">
+                <div key={product.id} className=" p-4 m-2 rounded shadow-md">
                     <h2 className="text-xl font-semibold">{product.name}</h2>
                     <p className="text-gray-700">{product.description}</p>
                     <p className="text-lg font-bold text-pink-600">${product.price.toFixed(2)}</p>
