@@ -20,7 +20,7 @@ export default function Sidebar() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md hover:bg-pink-100 transition shadow-sm ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-md hover:bg-pink-100 text-black transition shadow-sm ${
               pathname === item.href ? 'bg-pink-200 font-semibold' : ''
             }`}
           >
