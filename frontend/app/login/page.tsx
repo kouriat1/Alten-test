@@ -1,14 +1,16 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     const res = await fetch('http://localhost:3000/auth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -16,37 +18,43 @@ export default function LoginPage() {
     });
 
     if (res.ok) {
-      const { token } = await res.json();
-      document.cookie = `token=${token}; path=/`; 
+      const data = await res.json();
+      const token = data.access_token;
+      localStorage.setItem('token', token); 
+      document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Lax`;
       router.push('/products');
     } else {
-      alert('Erreur de connexion');
+      alert('Erreur d’identifiants');
     }
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl mb-4">Connexion</h1>
-      <input
-        className="border p-2 mb-2 w-full"
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        className="border p-2 mb-2 w-full"
-        type="password"
-        placeholder="Mot de passe"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button
-        className="bg-blue-600 text-white px-4 py-2"
-        onClick={handleLogin}
-      >
-        Se connecter
-      </button>
+    <div className="max-w-md mx-auto mt-20 border p-6 rounded shadow">
+      <h2 className="text-2xl font-bold mb-4 text-center">Connexion</h2>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <input
+          type="email"
+          className="border px-3 py-2 rounded"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          className="border px-3 py-2 rounded"
+          placeholder="Mot de passe"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Se connecter
+        </button>
+      </form>
     </div>
   );
 }
