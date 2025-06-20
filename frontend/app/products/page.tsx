@@ -5,24 +5,54 @@ import { Product } from '@/app/models/products/Product';
 import Modal from '@/app/components/products/Modal';
 import ProductForm from '@/app/components/products/ProductForm';
 import { useCart } from '@/app/context/CartContext';
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  email: string;
+  exp: number;
+  iat: number;
+  sub: string;
+}
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editedProduct, setEditedProduct] = useState<Product | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
 
   const { addToCart } = useCart();
 
-  const currentUserEmail: string = "user@user.com"; 
-  const isAdmin = currentUserEmail === "admin@admin.com";
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    
+
+    
+    if (token) {
+      try {
+        const decoded = jwtDecode<DecodedToken>(token);
+        setUserEmail(decoded.email);
+
+        fetch('http://localhost:3000/products', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => setProducts(data))
+          .catch((err) => console.error("Erreur chargement produits:", err));
+      } catch (err) {
+        console.error("Erreur lors du décodage du token", err);
+      }
+    }
+  }, []);
+
+  const isAdmin = userEmail === "admin@admin.com";
 
   const handleSave = (product: Product) => {
-    setProducts((prev) => {
-      const exists = prev.find((p) => p.id === product.id);
-      return exists
-        ? prev.map((p) => (p.id === product.id ? product : p))
-        : [...prev, product];
-    });
+    const exists = products.find((p) => p.id === product.id);
+    setProducts((prev) =>
+      exists ? prev.map((p) => (p.id === product.id ? product : p)) : [...prev, product]
+    );
     setShowModal(false);
     setEditedProduct(null);
   };
@@ -32,15 +62,24 @@ export default function ProductsPage() {
     setShowModal(true);
   };
 
-  const handleDelete = (id: number) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+  const handleDelete = async (id: number) => {
+    const token = localStorage.getItem('token');
+    try {
+      await fetch(`http://localhost:3000/products/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error("Erreur suppression produit", err);
+    }
   };
-
-  useEffect(() => {
-    fetch('/products.json')
-      .then((res) => res.json())
-      .then((data) => setProducts(data));
-  }, []);
+  console.log("Produits:", products);
+  console.log("Email utilisateur:", userEmail);
+  console.log("Est admin:", isAdmin);
+  console.log("Token:", localStorage.getItem('token'));
 
   return (
     <div>
@@ -77,7 +116,7 @@ export default function ProductsPage() {
         </Modal>
       )}
 
-      <div className="">
+      <div>
         {products.map((product) => (
           <div key={product.id} className="p-4 m-2 border rounded shadow-md">
             <h2 className="text-xl font-semibold">{product.name}</h2>
