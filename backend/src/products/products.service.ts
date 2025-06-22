@@ -38,20 +38,21 @@ export class ProductsService {
 
   }
 
-  async update(id: number | bigint | string, data: any) {
-    const updatedProduct = await this.prisma.product.update({
-       where: { id: typeof id === 'string' ? BigInt(id) : id },
-      data
-    });
-    return this.transformProduct(updatedProduct);
+  async update(id: number | string, data: any) {
+  const parsedId = typeof id === 'string' ? parseInt(id, 10) : id;
+  const updatedProduct = await this.prisma.product.update({
+    where: { id: parsedId },
+    data
+  });
+  return this.transformProduct(updatedProduct);
+}
 
-  }
+async remove(id: number | string) {
+  const parsedId = typeof id === 'string' ? parseInt(id, 10) : id;
+  const deletedProduct = await this.prisma.product.delete({
+    where: { id: parsedId }
+  });
+  return this.transformProduct(deletedProduct);
+}
 
-  async remove(id: number | bigint | string) {
-   const deletedProduct = await this.prisma.product.delete({
-      where: { id: typeof id === 'string' ? BigInt(id) : id } 
-    });
-    return this.transformProduct(deletedProduct);
-
-  }
 }
