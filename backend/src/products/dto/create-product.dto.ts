@@ -1,42 +1,21 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateProductDto {
-  @ApiProperty()
-  code: string;
 
-  @ApiProperty()
+
+
+  @IsNotEmpty()
+  @IsString()
   name: string;
 
-  @ApiProperty()
+  @IsString()
   description: string;
 
-  @ApiProperty()
-  image: string;
-
-  @ApiProperty()
-  category: string;
-
-  @ApiProperty()
+  @IsNumber()
   price: number;
 
-  @ApiProperty()
-  quantity: number;
-
-  @ApiProperty()
-  internalReference: string;
-
-  @ApiProperty()
-  shellId: number;
-
-  @ApiProperty({ enum: ['INSTOCK', 'LOWSTOCK', 'OUTOFSTOCK'] })
-  inventoryStatus: 'INSTOCK' | 'LOWSTOCK' | 'OUTOFSTOCK';
-
-  @ApiProperty()
-  rating: number;
-
-  @ApiProperty()
-  createdAt: number;
-
-  @ApiProperty()
-  updatedAt: number;
+  @IsNotEmpty()
+  @IsString()
+  category: string;
+  id: any;
 }
