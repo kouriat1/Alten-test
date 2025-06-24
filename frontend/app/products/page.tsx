@@ -22,7 +22,7 @@ export default function ProductsPage() {
   const [editedProduct, setEditedProduct] = useState<Product | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
 
-  const { addToCart } = useCart();
+const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -110,6 +110,7 @@ export default function ProductsPage() {
       console.error("Erreur suppression produit", err);
     }
   };
+
     const handleAddToCart = async (product: Product) => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -131,7 +132,7 @@ export default function ProductsPage() {
       const errorText = await res.text();
       throw new Error(errorText || 'Erreur ajout panier');
     }
-
+    
     alert(`Produit "${product.name}" ajouté au panier !`);
   } catch (error) {
     alert(`Erreur ajout au panier: ${(error as Error).message}`);
