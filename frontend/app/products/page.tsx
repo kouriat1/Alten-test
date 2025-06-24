@@ -5,7 +5,9 @@ import { Product } from '@/app/models/products/Product';
 import Modal from '@/app/components/products/Modal';
 import ProductForm from '@/app/components/products/ProductForm';
 import { useCart } from '@/app/context/CartContext';
-import { jwtDecode } from "jwt-decode";
+ import { jwtDecode } from "jwt-decode";
+import { addToCartApi } from '../utils/cartapi';
+
 
 interface DecodedToken {
   email: string;
@@ -24,9 +26,6 @@ export default function ProductsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    
-
-    
     if (token) {
       try {
         const decoded = jwtDecode<DecodedToken>(token);
@@ -48,13 +47,48 @@ export default function ProductsPage() {
 
   const isAdmin = userEmail === "admin@admin.com";
 
-  const handleSave = (product: Product) => {
-    const exists = products.find((p) => p.id === product.id);
-    setProducts((prev) =>
-      exists ? prev.map((p) => (p.id === product.id ? product : p)) : [...prev, product]
-    );
-    setShowModal(false);
-    setEditedProduct(null);
+  const handleSave = async (product: Product) => {
+    const token = localStorage.getItem('token');
+    try {
+      let savedProduct: Product;
+      if (product.id === undefined) {
+        const res = await fetch('http://localhost:3000/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(product),
+        });
+        if (!res.ok) throw new Error('Erreur création produit');
+        savedProduct = await res.json();
+      } else {
+        const res = await fetch(`http://localhost:3000/products/${product.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(product),
+        });
+        if (!res.ok) throw new Error('Erreur mise à jour produit');
+        savedProduct = await res.json();
+      }
+
+      setProducts((prev) => {
+        const exists = prev.find((p) => p.id === savedProduct.id);
+        if (exists) {
+          return prev.map((p) => (p.id === savedProduct.id ? savedProduct : p));
+        } else {
+          return [...prev, savedProduct];
+        }
+      });
+
+      setShowModal(false);
+      setEditedProduct(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleEdit = (product: Product) => {
@@ -76,10 +110,35 @@ export default function ProductsPage() {
       console.error("Erreur suppression produit", err);
     }
   };
-  console.log("Produits:", products);
-  console.log("Email utilisateur:", userEmail);
-  console.log("Est admin:", isAdmin);
-  console.log("Token:", localStorage.getItem('token'));
+    const handleAddToCart = async (product: Product) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Vous devez être connecté pour ajouter au panier.');
+    return;
+  }
+
+  try {
+    const res = await fetch('http://localhost:3000/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ productId: product.id, quantity: 1 }),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText || 'Erreur ajout panier');
+    }
+
+    alert(`Produit "${product.name}" ajouté au panier !`);
+  } catch (error) {
+    alert(`Erreur ajout au panier: ${(error as Error).message}`);
+  }
+};
+
+  
 
   return (
     <div>
@@ -141,7 +200,7 @@ export default function ProductsPage() {
                 </>
               ) : (
                 <button
-                  onClick={() => addToCart(product)}
+                  onClick={() => handleAddToCart(product)}
                   className="bg-pink-600 text-white px-3 py-1 rounded hover:bg-pink-700"
                 >
                   Ajouter au panier
