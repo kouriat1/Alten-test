@@ -52,7 +52,7 @@ export default function ProductsPage() {
     try {
       let savedProduct: Product;
       if (product.id === undefined) {
-        const res = await fetch('http://localhost:3000/products', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export default function ProductsPage() {
         if (!res.ok) throw new Error('Erreur création produit');
         savedProduct = await res.json();
       } else {
-        const res = await fetch(`http://localhost:3000/products/${product.id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${product.id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export default function ProductsPage() {
   const handleDelete = async (id: number) => {
     const token = localStorage.getItem('token');
     try {
-      await fetch(`http://localhost:3000/products/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,7 +118,7 @@ export default function ProductsPage() {
   }
 
   try {
-    const res = await fetch('http://localhost:3000/cart/add', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart/add`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

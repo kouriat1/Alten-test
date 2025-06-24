@@ -12,7 +12,7 @@ const [cart, setCart] = useState<CartItem[]>([]);
   const token = localStorage.getItem('token');
   if (!token) return;
 
-  fetch('http://localhost:3000/cart', {
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -31,7 +31,7 @@ const [cart, setCart] = useState<CartItem[]>([]);
     if (!token) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/cart/remove/${productId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart/remove/${productId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -48,7 +48,7 @@ const [cart, setCart] = useState<CartItem[]>([]);
     if (!token) return;
 
     try {
-      const res = await fetch('http://localhost:3000/cart/clear', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart/clear`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

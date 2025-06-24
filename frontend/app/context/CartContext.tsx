@@ -37,7 +37,7 @@ export const CartProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
     }
 
     try {
-      const res = await fetch('http://localhost:3000/cart', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('[CartProvider] fetchCart réponse status:', res.status);
@@ -72,7 +72,7 @@ export const CartProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/cart/add/${productId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${productId}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -93,7 +93,7 @@ export const CartProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/cart/remove/${cartItemId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${cartItemId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
